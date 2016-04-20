@@ -174,6 +174,8 @@ RCT_EXPORT_METHOD(moveFile:(NSString *)filepath
 
 RCT_EXPORT_METHOD(downloadFile:(NSString *)urlStr
                   filepath:(NSString *)filepath
+                  method:(NSString *)method
+                  postString:(NSString *)postString
                   jobId:(nonnull NSNumber *)jobId
                   callback:(RCTResponseSenderBlock)callback)
 {
@@ -182,6 +184,8 @@ RCT_EXPORT_METHOD(downloadFile:(NSString *)urlStr
 
   params.fromUrl = urlStr;
   params.toFile = filepath;
+  params.method = method;
+  params.postString = postString;
 
   params.callback = ^(NSNumber* statusCode, NSNumber* bytesWritten) {
     NSMutableDictionary* result = [[NSMutableDictionary alloc] initWithDictionary: @{@"jobId": jobId,
