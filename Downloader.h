@@ -9,6 +9,8 @@ typedef void (^ProgressCallback)(NSNumber*, NSNumber*);
 
 @property (copy) NSString* fromUrl;
 @property (copy) NSString* toFile;
+@property (copy) NSString* method;
+@property (copy) NSString* postString;
 @property (copy) DownloaderCallback callback;         // Download has finished (data written)
 @property (copy) ErrorCallback errorCallback;         // Something went wrong
 @property (copy) BeginCallback beginCallback;         // Download has started (headers received)

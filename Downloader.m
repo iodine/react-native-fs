@@ -22,7 +22,7 @@
 - (void)downloadFile:(DownloadParams*)params
 {
   _params = params;
-  
+
   _bytesWritten = 0;
 
   NSURL* url = [NSURL URLWithString:_params.fromUrl];
@@ -30,6 +30,11 @@
   NSMutableURLRequest* downloadRequest = [NSMutableURLRequest requestWithURL:url
                                                                  cachePolicy:NSURLRequestUseProtocolCachePolicy
                                                              timeoutInterval:30];
+  if ([_params.method isEqualToString: @"POST"]) {
+    [downloadRequest setHTTPMethod:_params.method];
+    NSString *postString = _params.postString;
+    [downloadRequest setHTTPBody:[postString dataUsingEncoding:NSUTF8StringEncoding]];
+  }
 
   [[NSFileManager defaultManager] createFileAtPath:_params.toFile contents:nil attributes:nil];
 
@@ -61,7 +66,7 @@
 
   _statusCode = [NSNumber numberWithLong:httpUrlResponse.statusCode];
   _contentLength = [NSNumber numberWithLong: httpUrlResponse.expectedContentLength];
-  
+
   return _params.beginCallback(_statusCode, _contentLength, httpUrlResponse.allHeaderFields);
 }
 

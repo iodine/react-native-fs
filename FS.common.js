@@ -83,7 +83,7 @@ var RNFS = {
       })
       .catch(convertError);
   },
-  
+
   exists(filepath) {
     return _exists(filepath)
       .catch(convertError);
@@ -150,7 +150,7 @@ var RNFS = {
       .catch(convertError);
   },
 
-  downloadFile(fromUrl, toFile, begin, progress) {
+  downloadFile(fromUrl, toFile, method = 'GET', paramString = '', begin, progress) {
     var jobId = getJobId();
     var subscriptionIos, subscriptionAndroid;
 
@@ -173,7 +173,7 @@ var RNFS = {
         subscriptionAndroid = DeviceEventEmitter.addListener('DownloadProgress-' + jobId, progress);
     }
 
-    return _downloadFile(fromUrl, toFile, jobId)
+    return _downloadFile(fromUrl, toFile, method, paramString, jobId)
       .then(res => {
         if (subscriptionIos) subscriptionIos.remove();
         if (subscriptionAndroid) subscriptionAndroid.remove();
@@ -189,7 +189,6 @@ var RNFS = {
   MainBundlePath: RNFSManager.MainBundlePath,
   CachesDirectoryPath: RNFSManager.NSCachesDirectoryPath,
   DocumentDirectoryPath: RNFSManager.NSDocumentDirectoryPath,
-  ExternalDirectoryPath: RNFSManager.NSExternalDirectoryPath,
   LibraryDirectoryPath: RNFSManager.NSLibraryDirectoryPath,
   PicturesDirectoryPath: RNFSManager.NSPicturesDirectoryPath
 };
