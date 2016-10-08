@@ -12,13 +12,15 @@ public class DownloadParams {
   public interface OnDownloadBegin {
     void onDownloadBegin(int statusCode, int contentLength, Map<String, String> headers);
   }
-  
+
   public interface OnDownloadProgress {
     void onDownloadProgress(int contentLength, int bytesWritten);
   }
-  
+
   public URL src;
   public File dest;
+  public String method;
+  public String postString;
   public OnTaskCompleted onTaskCompleted;
   public OnDownloadBegin onDownloadBegin;
   public OnDownloadProgress onDownloadProgress;
