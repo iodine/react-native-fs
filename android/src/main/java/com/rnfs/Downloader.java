@@ -37,13 +37,20 @@ public class Downloader extends AsyncTask<DownloadParams, int[], DownloadResult>
   }
 
   private void download(DownloadParams param, DownloadResult res) throws IOException {
+    if (param.method.equals("POST")) {
+      this.downloadViaPost(param, res);
+    } else {
+      this.downloadViaGet(param, res);
+    }
+  }
+
+  private void downloadViaGet(DownloadParams param, DownloadResult res) throws IOException {
     InputStream input = null;
     OutputStream output = null;
     HttpURLConnection connection = null;
 
     try {
       connection = (HttpURLConnection)param.src.openConnection();
-
       connection.setConnectTimeout(5000);
       connection.connect();
 
@@ -57,7 +64,7 @@ public class Downloader extends AsyncTask<DownloadParams, int[], DownloadResult>
       for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
         String headerKey = entry.getKey();
         String valueKey = entry.getValue().get(0);
-        
+
         if (headerKey != null && valueKey != null) {
           headersFlat.put(headerKey, valueKey);
         }
@@ -84,6 +91,65 @@ public class Downloader extends AsyncTask<DownloadParams, int[], DownloadResult>
 
       output.flush();
 
+      res.statusCode = statusCode;
+      res.bytesWritten = total;
+    } finally {
+      if (output != null) output.close();
+      if (input != null) input.close();
+      if (connection != null) connection.disconnect();
+    }
+  }
+
+  private void downloadViaPost(DownloadParams param, DownloadResult res) throws IOException {
+    InputStream input = null;
+    OutputStream output = null;
+    HttpURLConnection connection = null;
+
+    try {
+      connection = (HttpURLConnection)param.src.openConnection();
+      connection.setConnectTimeout(5000);
+      connection.setRequestMethod("POST");
+      connection.setDoOutput(true);
+
+      DataOutputStream wr = new DataOutputStream(connectio.getOutputStream());
+      wr.writeBytes(param.postString);
+      wr.flush();
+      wr.close();
+
+      int statusCode = connection.getResponseCode();
+      int lengthOfFile = connection.getContentLength();
+
+      Map<String, List<String>> headers = connection.getHeaderFields();
+
+      Map<String, String> headersFlat = new HashMap<String, String>();
+
+      for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+        String headerKey = entry.getKey();
+        String valueKey = entry.getValue().get(0);
+
+        if (headerKey != null && valueKey != null) {
+          headersFlat.put(headerKey, valueKey);
+        }
+      }
+      mParam.onDownloadBegin.onDownloadBegin(statusCode, lengthOfFile, headersFlat);
+
+      input = new BufferedInputStream(connection.getInputStream(), 8 * 1024);
+      output = new FileOutputStream(param.dest);
+      byte data[] = new byte[8 * 1024];
+      int total = 0;
+      int count;
+
+      while ((count = input.read(data)) != -1) {
+        if (mAbort.get()) {
+          break;
+        }
+
+        total += count;
+        publishProgress(new int[] { lengthOfFile, total });
+        output.write(data, 0, count);
+      }
+
+      output.flush();
       res.statusCode = statusCode;
       res.bytesWritten = total;
     } finally {
