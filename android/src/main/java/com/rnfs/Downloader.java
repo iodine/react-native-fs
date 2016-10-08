@@ -1,16 +1,15 @@
 package com.rnfs;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
 import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.net.HttpURLConnection;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.os.AsyncTask;
@@ -111,7 +110,7 @@ public class Downloader extends AsyncTask<DownloadParams, int[], DownloadResult>
       connection.setRequestMethod("POST");
       connection.setDoOutput(true);
 
-      DataOutputStream wr = new DataOutputStream(connectio.getOutputStream());
+      DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
       wr.writeBytes(param.postString);
       wr.flush();
       wr.close();
